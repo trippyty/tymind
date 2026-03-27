@@ -1980,8 +1980,7 @@ document.getElementById("filterCategory").addEventListener("change", applyFilter
 document.getElementById("filterStatus").addEventListener("change", applyFilters);
 document.getElementById("filterPriority").addEventListener("change", applyFilters);
 
-// ── Initialize Pokémon System ──
-initPokemonSystem();
+// ── Render task table (Pokémon init happens after declarations below) ──
 renderTable(TASKS);
 
 // ── Charts (pixel font for labels, live-updating) ──
@@ -2602,6 +2601,9 @@ function initPokemonSystem() {
   renderTrainerCard(TASKS);
   initTrainerCardToggle();
 }
+
+// ── Initialize Pokémon System (must be after all declarations) ──
+initPokemonSystem();
 </script>
 </body>
 </html>
