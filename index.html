@@ -795,6 +795,601 @@ canvas { max-height: 200px; }
 .sync-item.checking .material-symbols-outlined { color: var(--caution); animation: spin 1s linear infinite; }
 .sync-item.done .material-symbols-outlined { color: var(--good); }
 .sync-item.error .material-symbols-outlined { color: var(--critical); }
+/* ═══════════════════════════════════════════════════════════
+   Pokémon System CSS — TyMind Dashboard
+   Collectible & Discovery Theme
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── XP Bar & Leveling System ── */
+.pokemon-xp-bar {
+  background: var(--bg-card);
+  border: 2px solid var(--border-glow);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px auto;
+  max-width: 100%;
+  box-shadow: 0 0 12px rgba(0, 229, 160, 0.1);
+  font-family: var(--pixel-font);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.xp-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.xp-level-rank {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.xp-level-number {
+  font-size: 20px;
+  color: var(--cyan);
+  font-weight: bold;
+}
+
+.xp-rank-title {
+  font-size: 10px;
+  color: var(--yellow-star);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255, 224, 102, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.xp-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.xp-progress-bar {
+  height: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.xp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan) 0%, var(--mint) 100%);
+  transition: width 0.4s ease;
+  box-shadow: inset 0 0 6px rgba(0, 229, 160, 0.3);
+  position: relative;
+}
+
+.xp-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0px,
+    rgba(255, 255, 255, 0.1) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: xp-shimmer 2s linear infinite;
+}
+
+@keyframes xp-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.xp-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.xp-progress-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Gym Badges Bar ── */
+.gym-badges-bar {
+  background: var(--bg-card);
+  border: 2px solid var(--border-glow);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 16px auto;
+  max-width: 100%;
+  font-family: var(--pixel-font);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: 0 0 12px rgba(0, 229, 160, 0.1);
+}
+
+.gym-badges-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-width: fit-content;
+}
+
+.gym-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--border-subtle);
+  border-radius: 5px;
+  cursor: help;
+  transition: all 0.3s ease;
+  position: relative;
+  min-width: 60px;
+  text-align: center;
+}
+
+.gym-badge.earned {
+  border-color: var(--cyan);
+  background: rgba(0, 229, 160, 0.15);
+  box-shadow: 0 0 8px rgba(0, 229, 160, 0.4);
+}
+
+.gym-badge.earned::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background: var(--yellow-star);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--yellow-star);
+  animation: badge-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes badge-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.gym-badge:not(.earned) {
+  opacity: 0.5;
+}
+
+.gym-badge:not(.earned)::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.badge-emoji {
+  font-size: 22px;
+  filter: drop-shadow(0 0 2px rgba(0, 229, 160, 0.3));
+}
+
+.gym-badge:not(.earned) .badge-emoji {
+  filter: grayscale(100%) opacity(0.4);
+}
+
+.badge-progress {
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.badge-name {
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  max-width: 50px;
+  word-break: break-word;
+  line-height: 1;
+}
+
+/* ── Pokémon Trainer Card ── */
+.trainer-card-section {
+  background: var(--bg-card);
+  border: 2px solid var(--border-glow);
+  border-radius: 8px;
+  margin: 16px auto;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(0, 229, 160, 0.1);
+  font-family: var(--pixel-font);
+}
+
+.trainer-card-header {
+  background: linear-gradient(90deg, rgba(0, 229, 160, 0.2), rgba(0, 196, 180, 0.1));
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border-glow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.trainer-card-header:hover {
+  background: linear-gradient(90deg, rgba(0, 229, 160, 0.3), rgba(0, 196, 180, 0.2));
+}
+
+.trainer-card-title {
+  color: var(--cyan);
+  font-size: 13px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trainer-card-title::before {
+  content: '🎮';
+  font-size: 16px;
+}
+
+.trainer-card-toggle {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.trainer-card-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.trainer-card-content {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+  transition: max-height 0.3s ease;
+}
+
+.trainer-card-content.collapsed {
+  max-height: 0;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+.trainer-team {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trainer-team-label {
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.trainer-team-party {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pokemon-party-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--border-subtle);
+  border-radius: 5px;
+  min-width: 50px;
+  transition: all 0.3s ease;
+}
+
+.pokemon-party-slot.active {
+  border-color: var(--cyan);
+  background: rgba(0, 229, 160, 0.15);
+  box-shadow: 0 0 8px rgba(0, 229, 160, 0.3);
+}
+
+.pokemon-emoji {
+  font-size: 24px;
+  filter: drop-shadow(0 0 2px rgba(0, 229, 160, 0.3));
+}
+
+.pokemon-name {
+  font-size: 8px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  word-break: break-word;
+  max-width: 45px;
+}
+
+.pokedex-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pokedex-grid-label {
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pokedex-entries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 8px;
+}
+
+.pokedex-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--border-subtle);
+  border-radius: 5px;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pokedex-entry.unlocked {
+  border-color: var(--cyan);
+  background: rgba(0, 229, 160, 0.15);
+}
+
+.pokedex-entry.unlocked:hover {
+  box-shadow: 0 0 8px rgba(0, 229, 160, 0.4);
+  transform: scale(1.05);
+}
+
+.pokedex-entry.locked {
+  opacity: 0.5;
+}
+
+.pokedex-entry.locked::after {
+  content: '?';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  color: var(--text-muted);
+  font-family: var(--pixel-font);
+}
+
+.pokedex-emoji {
+  font-size: 28px;
+  filter: drop-shadow(0 0 2px rgba(0, 229, 160, 0.3));
+}
+
+.pokedex-entry.locked .pokedex-emoji {
+  filter: grayscale(100%) opacity(0.3);
+}
+
+.pokedex-number {
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.pokemon-new-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--critical);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  animation: pokemon-new-bounce 0.6s ease-in-out;
+}
+
+@keyframes pokemon-new-bounce {
+  0% { transform: scale(0) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ── Battle Animation Overlay ── */
+.battle-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 22, 40, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: battle-fade-in 0.3s ease;
+  pointer-events: none;
+}
+
+@keyframes battle-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.battle-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  font-family: var(--pixel-font);
+}
+
+.battle-message {
+  font-size: 16px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(0, 229, 160, 0.5);
+  animation: battle-text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 80vw;
+  word-wrap: break-word;
+}
+
+@keyframes battle-text-pop {
+  0% {
+    transform: scale(0) translateY(20px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.battle-xp-text {
+  font-size: 24px;
+  color: var(--yellow-star);
+  letter-spacing: 1px;
+  animation: battle-xp-float 2s ease-in-out forwards;
+  text-shadow: 0 0 12px rgba(255, 224, 102, 0.6);
+}
+
+@keyframes battle-xp-float {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+}
+
+.battle-explosion {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+}
+
+.explosion-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--critical);
+  border-radius: 50%;
+  animation: explosion-burst 1.2s ease-out forwards;
+}
+
+@keyframes explosion-burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+.battle-pokemon-unlock {
+  font-size: 20px;
+  color: var(--good);
+  letter-spacing: 2px;
+  animation: battle-text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s backwards;
+  text-shadow: 0 0 12px rgba(64, 224, 128, 0.6);
+}
+
+.pokemon-unlock-emoji {
+  font-size: 64px;
+  animation: pokemon-unlock-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.3s backwards;
+  filter: drop-shadow(0 0 12px rgba(64, 224, 128, 0.5));
+}
+
+@keyframes pokemon-unlock-bounce {
+  0% {
+    transform: scale(0) rotateY(180deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) rotateY(0deg);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .pokemon-xp-bar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .gym-badges-bar {
+    gap: 8px;
+  }
+
+  .pokedex-entries {
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+  }
+
+  .battle-message {
+    font-size: 14px;
+  }
+
+  .battle-xp-text {
+    font-size: 20px;
+  }
+
+  .pokemon-unlock-emoji {
+    font-size: 48px;
+  }
+}
 </style>
 </head>
 <body>
@@ -864,6 +1459,65 @@ canvas { max-height: 200px; }
   This dashboard reflects your Notion task tracker. Hit Refresh to copy a prompt for Claude to check Outlook, Slack, IR Inbox & Notion.
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     Pokémon System HTML — TyMind Dashboard
+     Inject after <div class="info-bar"> and before <div class="container">
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- XP Bar & Leveling System -->
+<div class="pokemon-xp-bar" id="pokemonXpBar">
+  <div class="xp-left">
+    <div class="xp-level-rank">
+      <span class="xp-level-number" id="xpLevel">1</span>
+      <span class="xp-rank-title" id="xpRankTitle">Bug Catcher</span>
+    </div>
+    <div class="xp-progress-label">Experience Points</div>
+  </div>
+  <div>
+    <div class="xp-progress-container">
+      <div class="xp-progress-bar">
+        <div class="xp-progress-fill" id="xpProgressFill" style="width: 0%;"></div>
+      </div>
+      <div class="xp-stats">
+        <span id="xpCurrent">0</span>
+        <span id="xpNext">/ 100</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gym Badges -->
+<div class="gym-badges-bar" id="gymBadgesBar">
+  <span class="gym-badges-label">Gym Badges:</span>
+  <!-- Badges generated by JavaScript -->
+</div>
+
+<!-- Pokémon Trainer Card (Collapsible) -->
+<div class="trainer-card-section" id="trainerCardSection">
+  <div class="trainer-card-header" id="trainerCardHeader">
+    <span class="trainer-card-title">Your Team</span>
+    <button class="trainer-card-toggle" id="trainerCardToggle" aria-label="Toggle trainer card">▼</button>
+  </div>
+  <div class="trainer-card-content" id="trainerCardContent">
+
+    <!-- Current Team (Party) -->
+    <div class="trainer-team">
+      <div class="trainer-team-label">Current Party (6 Most Recent)</div>
+      <div class="trainer-team-party" id="trainerTeamParty">
+        <!-- Pokémon party slots generated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Full Pokédex -->
+    <div class="pokedex-grid">
+      <div class="pokedex-grid-label">Complete Pokédex</div>
+      <div class="pokedex-entries" id="pokedexEntries">
+        <!-- Pokédex entries generated by JavaScript -->
+      </div>
+    </div>
+
+  </div>
+</div>
 <div class="container">
 
   <!-- KPI Strip -->
@@ -1214,6 +1868,16 @@ function handleEdit(el) {
 
     // Re-render tables so task moves between In Progress / Complete
     if (field === "status") applyFilters();
+
+    // ── Pokémon System: Award XP when task is marked Complete ──
+    if (field === "status" && value === "Complete" && oldVal !== "Complete") {
+      if (!pokemonState.completedTasks.includes(taskId)) {
+        pokemonState.completedTasks.push(taskId);
+        POKEMON_STORAGE.set("completedTasks", pokemonState.completedTasks);
+      }
+      awardXP(task.priority);
+      renderGymBadges(TASKS);
+    }
   }
 }
 
@@ -1316,6 +1980,8 @@ document.getElementById("filterCategory").addEventListener("change", applyFilter
 document.getElementById("filterStatus").addEventListener("change", applyFilters);
 document.getElementById("filterPriority").addEventListener("change", applyFilters);
 
+// ── Initialize Pokémon System ──
+initPokemonSystem();
 renderTable(TASKS);
 
 // ── Charts (pixel font for labels, live-updating) ──
@@ -1557,6 +2223,384 @@ function copySyncPayload() {
     showToast("Copied to clipboard!");
     closeSyncModal();
   });
+}
+/* ═══════════════════════════════════════════════════════════
+   Pokémon System JavaScript — TyMind Dashboard
+   Collectible & Discovery Theme
+   ═══════════════════════════════════════════════════════════ */
+
+// ── Pokémon Database & Configuration ──
+const POKEMON_CONFIG = {
+  pokemon: [
+    { milestone: 1, name: "Magikarp", emoji: "🐟", number: 129 },
+    { milestone: 3, name: "Pidgey", emoji: "🐦", number: 16 },
+    { milestone: 5, name: "Charmander", emoji: "🔥", number: 4 },
+    { milestone: 8, name: "Pikachu", emoji: "⚡", number: 25 },
+    { milestone: 12, name: "Eevee", emoji: "🦊", number: 133 },
+    { milestone: 16, name: "Gengar", emoji: "👻", number: 94 },
+    { milestone: 20, name: "Dragonite", emoji: "🐉", number: 149 },
+    { milestone: 25, name: "Mewtwo", emoji: "🔮", number: 150 },
+    { milestone: 30, name: "Mew", emoji: "✨", number: 151 },
+    { milestone: 35, name: "Rayquaza", emoji: "🌪️", number: 384 },
+    { milestone: 40, name: "Arceus", emoji: "💫", number: 493 }
+  ],
+  levels: [
+    { level: 1, xp: 0 },
+    { level: 2, xp: 100 },
+    { level: 3, xp: 250 },
+    { level: 4, xp: 500 },
+    { level: 5, xp: 800 },
+    { level: 6, xp: 1150 },
+    { level: 7, xp: 1550 },
+    { level: 8, xp: 2000 },
+    { level: 9, xp: 2500 },
+    { level: 10, xp: 3050 },
+    { level: 11, xp: 3650 },
+    { level: 12, xp: 4300 },
+    { level: 13, xp: 5000 },
+    { level: 14, xp: 5750 },
+    { level: 15, xp: 6550 }
+  ],
+  ranks: {
+    "Bug Catcher": { minLevel: 1, maxLevel: 2 },
+    "Hiker": { minLevel: 3, maxLevel: 4 },
+    "Ace Trainer": { minLevel: 5, maxLevel: 7 },
+    "Gym Leader": { minLevel: 8, maxLevel: 10 },
+    "Elite Four": { minLevel: 11, maxLevel: 14 },
+    "Champion": { minLevel: 15, maxLevel: 999 }
+  },
+  gyms: [
+    { category: "IR - Core Fund", name: "Boulder Badge", emoji: "🪨", id: "core-fund" },
+    { category: "IR - USFRT II", name: "Cascade Badge", emoji: "💧", id: "usfrt2" },
+    { category: "IR - USFRT III", name: "Thunder Badge", emoji: "⚡", id: "usfrt3" },
+    { category: "Communications", name: "Rainbow Badge", emoji: "🌈", id: "comms" },
+    { category: "Culture", name: "Soul Badge", emoji: "💜", id: "culture" },
+    { category: "Operations/HR", name: "Marsh Badge", emoji: "🔮", id: "ops" }
+  ],
+  xpRewards: {
+    "High": 30,
+    "Medium": 20,
+    "Low": 10
+  }
+};
+
+// ── Local Storage Management ──
+const POKEMON_STORAGE = {
+  PREFIX: "pokemon_system_",
+
+  get: (key) => {
+    const stored = localStorage.getItem(POKEMON_STORAGE.PREFIX + key);
+    return stored ? JSON.parse(stored) : null;
+  },
+
+  set: (key, value) => {
+    localStorage.setItem(POKEMON_STORAGE.PREFIX + key, JSON.stringify(value));
+  },
+
+  getOrDefault: (key, defaultValue) => {
+    const stored = POKEMON_STORAGE.get(key);
+    return stored !== null ? stored : defaultValue;
+  }
+};
+
+// ── State Management ──
+let pokemonState = {
+  totalXp: POKEMON_STORAGE.getOrDefault("totalXp", 0),
+  completedTasks: POKEMON_STORAGE.getOrDefault("completedTasks", []),
+  unlockedPokemon: POKEMON_STORAGE.getOrDefault("unlockedPokemon", []),
+  earnedBadges: POKEMON_STORAGE.getOrDefault("earnedBadges", [])
+};
+
+// ── XP & Level Calculations ──
+function getLevelFromXp(totalXp) {
+  let level = 1;
+  for (let i = POKEMON_CONFIG.levels.length - 1; i >= 0; i--) {
+    if (totalXp >= POKEMON_CONFIG.levels[i].xp) {
+      level = POKEMON_CONFIG.levels[i].level;
+      break;
+    }
+  }
+  return level;
+}
+
+function getXpForLevel(level) {
+  const levelData = POKEMON_CONFIG.levels.find(l => l.level === level);
+  return levelData ? levelData.xp : 0;
+}
+
+function getXpToNextLevel(totalXp) {
+  const currentLevel = getLevelFromXp(totalXp);
+  const nextLevel = currentLevel + 1;
+  const nextLevelXp = getXpForLevel(nextLevel);
+  const currentLevelXp = getXpForLevel(currentLevel);
+  const xpInLevel = totalXp - currentLevelXp;
+  const xpNeeded = nextLevelXp - currentLevelXp;
+  return { xpInLevel, xpNeeded, progress: (xpInLevel / xpNeeded) * 100 };
+}
+
+function getRankFromLevel(level) {
+  for (const [rank, data] of Object.entries(POKEMON_CONFIG.ranks)) {
+    if (level >= data.minLevel && level <= data.maxLevel) {
+      return rank;
+    }
+  }
+  return "Champion";
+}
+
+// ── Pokémon Management ──
+function getUnlockedPokemon(totalCompletedTasks) {
+  const unlocked = [];
+  for (const poke of POKEMON_CONFIG.pokemon) {
+    if (totalCompletedTasks >= poke.milestone) {
+      unlocked.push(poke);
+    }
+  }
+  return unlocked;
+}
+
+function checkNewPokemonUnlocked(oldCount, newCount) {
+  if (newCount > oldCount) {
+    const oldUnlocked = getUnlockedPokemon(oldCount);
+    const newUnlocked = getUnlockedPokemon(newCount);
+    return newUnlocked.filter(p => !oldUnlocked.find(o => o.name === p.name))[0] || null;
+  }
+  return null;
+}
+
+// ── Badge Management ──
+function checkEarnedBadges(tasks) {
+  const earned = [];
+  for (const gym of POKEMON_CONFIG.gyms) {
+    const categoryTasks = tasks.filter(t => t.category === gym.category);
+    if (categoryTasks.length > 0) {
+      const allComplete = categoryTasks.every(t => t.status === "Complete");
+      if (allComplete) {
+        earned.push(gym.id);
+      }
+    }
+  }
+  return earned;
+}
+
+function getBadgeProgress(tasks, gym) {
+  const categoryTasks = tasks.filter(t => t.category === gym.category);
+  const completedTasks = categoryTasks.filter(t => t.status === "Complete").length;
+  return { completed: completedTasks, total: categoryTasks.length };
+}
+
+// ── Rendering Functions ──
+function renderXpBar() {
+  const level = getLevelFromXp(pokemonState.totalXp);
+  const rank = getRankFromLevel(level);
+  const { xpInLevel, xpNeeded, progress } = getXpToNextLevel(pokemonState.totalXp);
+
+  document.getElementById("xpLevel").textContent = level;
+  document.getElementById("xpRankTitle").textContent = rank;
+  document.getElementById("xpCurrent").textContent = xpInLevel;
+  document.getElementById("xpNext").textContent = `/ ${xpNeeded}`;
+  document.getElementById("xpProgressFill").style.width = `${progress}%`;
+}
+
+function renderGymBadges(tasks) {
+  const badgesBar = document.getElementById("gymBadgesBar");
+  const badgesContainer = badgesBar.querySelector(".gym-badges-label") || badgesBar;
+
+  // Clear old badges (keep label)
+  const oldBadges = badgesBar.querySelectorAll(".gym-badge");
+  oldBadges.forEach(b => b.remove());
+
+  const earnedBadges = checkEarnedBadges(tasks);
+
+  for (const gym of POKEMON_CONFIG.gyms) {
+    const isEarned = earnedBadges.includes(gym.id);
+    const progress = getBadgeProgress(tasks, gym);
+    const badgeEl = document.createElement("div");
+    badgeEl.className = `gym-badge ${isEarned ? "earned" : ""}`;
+    badgeEl.innerHTML = `
+      <div class="badge-emoji">${gym.emoji}</div>
+      <div class="badge-progress">${progress.completed}/${progress.total}</div>
+      <div class="badge-name">${gym.name}</div>
+    `;
+    badgeEl.title = `${gym.category}: ${progress.completed}/${progress.total} complete`;
+    badgesBar.appendChild(badgeEl);
+  }
+
+  pokemonState.earnedBadges = earnedBadges;
+  POKEMON_STORAGE.set("earnedBadges", earnedBadges);
+}
+
+function renderTrainerCard(tasks) {
+  const party = pokemonState.unlockedPokemon.slice(-6).reverse();
+  const partyEl = document.getElementById("trainerTeamParty");
+  partyEl.innerHTML = "";
+
+  for (const poke of party) {
+    const slotEl = document.createElement("div");
+    slotEl.className = "pokemon-party-slot active";
+    slotEl.innerHTML = `
+      <div class="pokemon-emoji">${poke.emoji}</div>
+      <div class="pokemon-name">${poke.name}</div>
+    `;
+    slotEl.title = `${poke.name} #${poke.number}`;
+    partyEl.appendChild(slotEl);
+  }
+
+  // Full Pokédex
+  const pokedexEl = document.getElementById("pokedexEntries");
+  pokedexEl.innerHTML = "";
+
+  for (const poke of POKEMON_CONFIG.pokemon) {
+    const isUnlocked = pokemonState.unlockedPokemon.find(p => p.name === poke.name);
+    const entryEl = document.createElement("div");
+    entryEl.className = `pokedex-entry ${isUnlocked ? "unlocked" : "locked"}`;
+    entryEl.innerHTML = `
+      <div class="pokedex-emoji">${isUnlocked ? poke.emoji : "❓"}</div>
+      <div class="pokedex-number">#${poke.number.toString().padStart(3, "0")}</div>
+    `;
+    if (isUnlocked) {
+      entryEl.title = `${poke.name} - Unlocked at ${poke.milestone} task${poke.milestone === 1 ? "" : "s"}`;
+    } else {
+      entryEl.title = `${poke.name} - Unlock at ${poke.milestone} completed tasks`;
+    }
+    pokedexEl.appendChild(entryEl);
+  }
+}
+
+// ── Trainer Card Toggle ──
+function initTrainerCardToggle() {
+  const header = document.getElementById("trainerCardHeader");
+  const toggle = document.getElementById("trainerCardToggle");
+  const content = document.getElementById("trainerCardContent");
+
+  const isCollapsed = POKEMON_STORAGE.getOrDefault("trainerCardCollapsed", false);
+  if (isCollapsed) {
+    content.classList.add("collapsed");
+    toggle.classList.add("collapsed");
+  }
+
+  header.addEventListener("click", () => {
+    content.classList.toggle("collapsed");
+    toggle.classList.toggle("collapsed");
+    const collapsed = content.classList.contains("collapsed");
+    POKEMON_STORAGE.set("trainerCardCollapsed", collapsed);
+  });
+}
+
+// ── Battle Animation ──
+function showBattleAnimation(xpEarned, newPokemon = null) {
+  const overlay = document.createElement("div");
+  overlay.className = "battle-overlay";
+
+  const content = document.createElement("div");
+  content.className = "battle-content";
+
+  // Battle message
+  const message = document.createElement("div");
+  message.className = "battle-message";
+  message.textContent = "TASK used Complete! It's super effective!";
+  content.appendChild(message);
+
+  // Explosion effect
+  const explosionContainer = document.createElement("div");
+  explosionContainer.className = "battle-explosion";
+  explosionContainer.style.left = "50%";
+  explosionContainer.style.top = "50%";
+  explosionContainer.style.transform = "translate(-50%, -50%)";
+
+  const particleCount = 12;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "explosion-particle";
+    const angle = (i / particleCount) * Math.PI * 2;
+    const distance = 80;
+    const tx = Math.cos(angle) * distance;
+    const ty = Math.sin(angle) * distance;
+    particle.style.setProperty("--tx", `${tx}px`);
+    particle.style.setProperty("--ty", `${ty}px`);
+    explosionContainer.appendChild(particle);
+  }
+  content.appendChild(explosionContainer);
+
+  // XP text
+  const xpText = document.createElement("div");
+  xpText.className = "battle-xp-text";
+  xpText.textContent = `+${xpEarned} XP!`;
+  content.appendChild(xpText);
+
+  // New Pokémon unlock (if applicable)
+  if (newPokemon) {
+    const unlockText = document.createElement("div");
+    unlockText.className = "battle-pokemon-unlock";
+    unlockText.textContent = `🎉 NEW POKÉMON UNLOCKED! 🎉`;
+    content.appendChild(unlockText);
+
+    const pokeEmoji = document.createElement("div");
+    pokeEmoji.className = "pokemon-unlock-emoji";
+    pokeEmoji.textContent = newPokemon.emoji;
+    content.appendChild(pokeEmoji);
+
+    const pokeName = document.createElement("div");
+    pokeName.className = "battle-message";
+    pokeName.style.color = "var(--good)";
+    pokeName.style.marginTop = "8px";
+    pokeName.textContent = newPokemon.name;
+    content.appendChild(pokeName);
+  }
+
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+
+  // Remove after animation
+  const duration = newPokemon ? 3200 : 2400;
+  setTimeout(() => {
+    overlay.style.animation = "battle-fade-in 0.3s ease reverse";
+    setTimeout(() => overlay.remove(), 300);
+  }, duration);
+}
+
+// ── Award XP & Check Milestones ──
+function awardXP(priority) {
+  const xpAmount = POKEMON_CONFIG.xpRewards[priority] || 10;
+  const oldLevel = getLevelFromXp(pokemonState.totalXp);
+  const oldPokemonCount = pokemonState.unlockedPokemon.length;
+
+  pokemonState.totalXp += xpAmount;
+  const newLevel = getLevelFromXp(pokemonState.totalXp);
+  const newUnlockedPokemon = getUnlockedPokemon(pokemonState.completedTasks.length);
+  const newPokemon = checkNewPokemonUnlocked(oldPokemonCount, newUnlockedPokemon.length);
+
+  pokemonState.unlockedPokemon = newUnlockedPokemon;
+
+  POKEMON_STORAGE.set("totalXp", pokemonState.totalXp);
+  POKEMON_STORAGE.set("unlockedPokemon", pokemonState.unlockedPokemon);
+
+  renderXpBar();
+  renderTrainerCard(TASKS);
+
+  showBattleAnimation(xpAmount, newPokemon);
+}
+
+// ── Initialization ──
+function initPokemonSystem() {
+  // Restore state from localStorage
+  pokemonState.totalXp = POKEMON_STORAGE.getOrDefault("totalXp", 0);
+  pokemonState.completedTasks = POKEMON_STORAGE.getOrDefault("completedTasks", []);
+  pokemonState.unlockedPokemon = POKEMON_STORAGE.getOrDefault("unlockedPokemon", []);
+  pokemonState.earnedBadges = POKEMON_STORAGE.getOrDefault("earnedBadges", []);
+
+  // Initial calculation based on current task state
+  const completedTaskIds = TASKS.filter(t => t.status === "Complete").map(t => t.id);
+  pokemonState.completedTasks = completedTaskIds;
+  pokemonState.unlockedPokemon = getUnlockedPokemon(completedTaskIds.length);
+
+  POKEMON_STORAGE.set("completedTasks", pokemonState.completedTasks);
+  POKEMON_STORAGE.set("unlockedPokemon", pokemonState.unlockedPokemon);
+
+  // Render all elements
+  renderXpBar();
+  renderGymBadges(TASKS);
+  renderTrainerCard(TASKS);
+  initTrainerCardToggle();
 }
 </script>
 </body>
