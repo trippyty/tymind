@@ -2230,7 +2230,7 @@ function copySyncPayload() {
    ═══════════════════════════════════════════════════════════ */
 
 // ── Pokémon Database & Configuration ──
-const POKEMON_CONFIG = {
+var POKEMON_CONFIG = {
   pokemon: [
     { milestone: 1, name: "Magikarp", emoji: "🐟", number: 129 },
     { milestone: 3, name: "Pidgey", emoji: "🐦", number: 16 },
@@ -2285,7 +2285,7 @@ const POKEMON_CONFIG = {
 };
 
 // ── Local Storage Management ──
-const POKEMON_STORAGE = {
+var POKEMON_STORAGE = {
   PREFIX: "pokemon_system_",
 
   get: (key) => {
@@ -2304,7 +2304,7 @@ const POKEMON_STORAGE = {
 };
 
 // ── State Management ──
-let pokemonState = {
+var pokemonState = {
   totalXp: POKEMON_STORAGE.getOrDefault("totalXp", 0),
   completedTasks: POKEMON_STORAGE.getOrDefault("completedTasks", []),
   unlockedPokemon: POKEMON_STORAGE.getOrDefault("unlockedPokemon", []),
