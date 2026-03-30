@@ -1390,6 +1390,25 @@ canvas { max-height: 200px; }
     font-size: 48px;
   }
 }
+
+/* ── Comment tooltip ── */
+.comment-cell { position: relative; width: 32px; text-align: center; }
+.comment-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 4px; opacity: 0.3; transition: opacity 0.2s, background 0.2s; color: var(--text-muted); line-height: 1; }
+.comment-btn:hover, .comment-btn.has-comment { opacity: 1; }
+.comment-btn.has-comment { color: var(--cyan); }
+tr:hover .comment-btn { opacity: 0.7; }
+tr:hover .comment-btn.has-comment { opacity: 1; }
+.comment-popup { display: none; position: fixed; z-index: 9999; background: rgba(8, 18, 36, 0.97); border: 1px solid var(--border-glow); border-radius: 8px; padding: 12px; width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+.comment-popup.visible { display: block; }
+.comment-popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 11px; color: var(--text-muted); font-family: 'Press Start 2P', monospace; letter-spacing: 0.5px; }
+.comment-popup-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1; }
+.comment-popup-close:hover { color: #fff; }
+.comment-textarea { width: 100%; min-height: 60px; max-height: 120px; background: rgba(12, 28, 48, 0.6); border: 1px solid var(--border-subtle); border-radius: 6px; color: var(--text-body); font-family: 'Roobert', sans-serif; font-size: 13px; padding: 8px; resize: vertical; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+.comment-textarea:focus { border-color: var(--cyan); }
+.comment-textarea::placeholder { color: var(--text-muted); opacity: 0.5; }
+.comment-save-row { display: flex; justify-content: flex-end; margin-top: 6px; gap: 6px; }
+.comment-save-btn { background: var(--cyan); color: #0a1628; border: none; border-radius: 4px; padding: 4px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.comment-save-btn:hover { opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -1610,6 +1629,7 @@ canvas { max-height: 200px; }
           <th>Priority</th>
           <th>Owner</th>
           <th>Due</th>
+          <th style="width:32px;"></th>
         </tr>
       </thead>
       <tbody id="taskBodyActive"></tbody>
@@ -1636,12 +1656,25 @@ canvas { max-height: 200px; }
           <th>Priority</th>
           <th>Owner</th>
           <th>Due</th>
+          <th style="width:32px;"></th>
         </tr>
       </thead>
       <tbody id="taskBodyComplete"></tbody>
     </table>
   </div>
 
+</div>
+
+<!-- Comment popup -->
+<div class="comment-popup" id="commentPopup">
+  <div class="comment-popup-header">
+    <span id="commentPopupTitle">NOTES</span>
+    <button class="comment-popup-close" onclick="closeCommentPopup()">&times;</button>
+  </div>
+  <textarea class="comment-textarea" id="commentTextarea" placeholder="Add a note..."></textarea>
+  <div class="comment-save-row">
+    <button class="comment-save-btn" onclick="saveComment()">Save</button>
+  </div>
 </div>
 
 <!-- Sync overlay -->
@@ -1734,44 +1767,44 @@ function fireShootingStar() {
 
 // ── Task data (with Notion page IDs for sync) ──
 const TASKS = [
-  { id: "TS-1", notionId: "32f4b5e1-c025-81b4-b9b3-dd271b62b4cf", task: "USFRT III Newsletter — incorporate platform-level financial summary tables", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Tyler / Joe K / Craig", due: "Mar 31" },
-  { id: "TS-2", notionId: "32f4b5e1-c025-81cd-bb14-f380d373166d", task: "USFRT III Newsletter — resolve Peach Truck EBITDA discrepancy ($900K vs $300K)", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Joe K / Eric Butter / Carol Avila", due: "" },
-  { id: "TS-3", notionId: "32f4b5e1-c025-81a8-9c19-c245545de509", task: "USFRT III Newsletter — finalize remaining fund-level placeholders", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Tyler / Erika", due: "Mar 31" },
-  { id: "TS-4", notionId: "32f4b5e1-c025-81c4-b963-f54398f1f3db", task: "USFRT III Newsletter — send Erika updated draft", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Erika Viall", due: "Mar 27" },
-  { id: "TS-5", notionId: "32f4b5e1-c025-814a-b153-c2eebb43ed53", task: "Nippon Life Q4 2025 Data Request — confirm receipt of updated workbook", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Alex Daves", due: "Mar 31" },
-  { id: "TS-6", notionId: "32f4b5e1-c025-81e9-b77d-d77c85956b29", task: "VRS Workbook — waiting on Erika", category: "IR - USFRT II", status: "Complete", priority: "Medium", owner: "Alex / Erika", due: "Mar 31" },
-  { id: "TS-7", notionId: "32f4b5e1-c025-81c0-b47d-f8e756dd556c", task: "IEQ Capital LLC Questionnaire — confirm completion", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Alex Daves", due: "" },
-  { id: "TS-8", notionId: "32f4b5e1-c025-8178-8bab-ffa1d79e6cad", task: "VRS – Townsend Questionnaire", category: "IR - Core Fund", status: "Complete", priority: "High", owner: "Tyler / Alex", due: "Apr 15" },
-  { id: "TS-9", notionId: "32f4b5e1-c025-8164-aed4-c66b71baaa4b", task: "Core Fund Newsletter — send draft to auditors", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Tyler / Brenda", due: "Mar 31" },
-  { id: "TS-10", notionId: "32f4b5e1-c025-810f-a225-cb21c51ca92b", task: "IFC State Composite Letters TY2025 — follow up with PwC", category: "IR - Core Fund", status: "Waiting On Others", priority: "Medium", owner: "Alex Daves", due: "" },
-  { id: "TS-11", notionId: "32f4b5e1-c025-81dc-8303-c7d714642d53", task: "Distribution #16 — confirm Nippon reinvestment allocation", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Alex / Erika / Brenda", due: "" },
-  { id: "TS-12", notionId: "32f4b5e1-c025-81f7-a228-f91c2e7faa6a", task: "USFRT II K-1s — confirm federal and state delivery", category: "IR - Core Fund", status: "Waiting On Others", priority: "High", owner: "Alex / Erika / Chelsey", due: "Apr 15" },
-  { id: "TS-13", notionId: "32f4b5e1-c025-8136-894f-f655ca168a7a", task: "Sloan Carlson internship — forward resume/cover letter to Alex", category: "Operations/HR", status: "Waiting On Others", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-14", notionId: "32f4b5e1-c025-8108-9119-fb7407613674", task: "Leave Eli Gray's MacBook + charger at front desk for ThinkTech pickup", category: "Operations/HR", status: "Complete", priority: "High", owner: "Tyler", due: "Mar 26" },
-  { id: "TS-15", notionId: "32f4b5e1-c025-8183-8940-fd5513ae36d4", task: "Box Renewal — connect with Noah Greenberg about new contract", category: "Operations/HR", status: "In Progress", priority: "Medium", owner: "Tyler", due: "Mar 28" },
-  { id: "TS-16", notionId: "32f4b5e1-c025-81c7-b8ff-ca9e745423fa", task: "Post weekly #ir-updates", category: "Communications", status: "Not Started", priority: "High", owner: "Tyler", due: "Mar 26" },
-  { id: "TS-17", notionId: "32f4b5e1-c025-8100-bec1-e83d1dbb36a7", task: "RSVP for CRM Discussion meeting", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "Mar 31" },
-  { id: "TS-18", notionId: "32f4b5e1-c025-81e5-8cf6-d53683beac47", task: "Ohio data request — Alex to research", category: "IR - USFRT II", status: "Waiting On Others", priority: "Medium", owner: "Alex Daves", due: "" },
-  { id: "TS-19", notionId: "32f4b5e1-c025-81a6-b78a-d34648742fbe", task: "Ownership Transfer Paperwork for Andrew A. Payne Trust", category: "IR - Core Fund", status: "Waiting On Others", priority: "Medium", owner: "Tyler / Alex / Brooks Pierce", due: "" },
-  { id: "TS-20", notionId: "32f4b5e1-c025-81fc-8e35-e96b40aeed1f", task: "Harrison Street / Versus Capital — confirm receipt of farmland templates", category: "IR - Core Fund", status: "Complete", priority: "Low", owner: "Tyler / Alex", due: "" },
-  { id: "TS-21", notionId: "32f4b5e1-c025-819e-8310-f2e49dcbe85b", task: "Rethink Events / AG BRANDS — decide on ticket transfer", category: "Communications", status: "Complete", priority: "Low", owner: "Tyler", due: "" },
-  { id: "TS-22", notionId: "32f4b5e1-c025-81e8-8a45-fb321cfff606", task: "Daniel Wichman voicemail — confirm forwarded to HR", category: "Culture", status: "Complete", priority: "Low", owner: "Roxie Nebel", due: "" },
-  { id: "TS-23", notionId: "32f4b5e1-c025-81fc-aa40-ed7c237b6d07", task: "PNW newsletter write-up — get context from Paul Kim / Toby", category: "Communications", status: "Complete", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-24", notionId: "3304b5e1-c025-81c0-8835-f376b9fd4be7", task: "Weekdone invoice — John Kruse locked out of OKR platform", category: "Operations/HR", status: "Complete", priority: "High", owner: "Tyler", due: "" },
-  { id: "TS-25", notionId: "3304b5e1-c025-81b6-863e-f3ef3da8a0e1", task: "Forward IR analyst candidate resume (Eli Cheatham) to John Graves & Alex Daves", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-26", notionId: "3304b5e1-c025-8172-987d-f75ea06e1682", task: "Reply to Alex Daves — schedule custom CRM discussion", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-27", notionId: "3304b5e1-c025-81c3-b485-e65c9077de20", task: "Review Joe's updated USFRT III Fundamental Data", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Tyler", due: "" },
-  { id: "TS-28", notionId: "3304b5e1-c025-8137-b775-de43b43bcc75", task: "Check Intralinks exchange — new 'FS v3 questions' document", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-29", notionId: "3304b5e1-c025-81ad-941d-eb8cb47b7172", task: "Add Aishwarya Tandon to Intl. Farming Claude license", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-30", notionId: "3304b5e1-c025-81f4-8b33-de0ea5665f6b", task: "Reply to Alex DMs — VRS document recipient + Ohio questionnaire location", category: "IR - USFRT II", status: "Not Started", priority: "High", owner: "Tyler", due: "" },
-  { id: "TS-31", notionId: "3304b5e1-c025-8178-846a-f9f09655014d", task: "Q4 2025 Cybersecurity Review — review ThinkTech report with Eli Gray", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-32", notionId: "3304b5e1-c025-8178-846a-f9f09655014d", task: "Check voicemail from (984) number — forwarded to IR inbox", category: "IR - Core Fund", status: "Not Started", priority: "Low", owner: "Tyler", due: "" },
-  { id: "TS-33", notionId: "3334b5e1-c025-8195-b0dc-d550e444d778", task: "Reply to TresVista — set up Claude access for Neharika Pattnaik", category: "Operations/HR", status: "Not Started", priority: "High", owner: "Tyler", due: "" },
-  { id: "TS-34", notionId: "3334b5e1-c025-8146-8479-e2e6ddde6df9", task: "Review USFRT III 2025 Q4 Financials Workbook on Intralinks", category: "IR - USFRT III", status: "Not Started", priority: "High", owner: "Tyler", due: "" },
-  { id: "TS-35", notionId: "3334b5e1-c025-81e7-8480-c6608647374d", task: "Process Lloyd Chapins expense submissions with Simran", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-36", notionId: "3334b5e1-c025-8121-a2e8-d2b423001dec", task: "Check shared investor inbox manually", category: "IR - Core Fund", status: "Not Started", priority: "High", owner: "Tyler", due: "" },
-  { id: "TS-37", notionId: "3334b5e1-c025-81ed-8bc9-fedd8e4985d6", task: "IR analyst/associate hiring — confirm Indeed posting & review candidates", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "" },
-  { id: "TS-38", notionId: "3334b5e1-c025-8195-8de8-c3525d2ff4cf", task: "ThinkTech IT Review meeting prep", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "Mar 31" },
+  { id: "TS-1", notionId: "32f4b5e1-c025-81b4-b9b3-dd271b62b4cf", task: "USFRT III Newsletter — incorporate platform-level financial summary tables", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Tyler / Joe K / Craig", due: "Mar 31", comment: "" },
+  { id: "TS-2", notionId: "32f4b5e1-c025-81cd-bb14-f380d373166d", task: "USFRT III Newsletter — resolve Peach Truck EBITDA discrepancy ($900K vs $300K)", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Joe K / Eric Butter / Carol Avila", due: "", comment: "" },
+  { id: "TS-3", notionId: "32f4b5e1-c025-81a8-9c19-c245545de509", task: "USFRT III Newsletter — finalize remaining fund-level placeholders", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Tyler / Erika", due: "Mar 31", comment: "" },
+  { id: "TS-4", notionId: "32f4b5e1-c025-81c4-b963-f54398f1f3db", task: "USFRT III Newsletter — send Erika updated draft", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Erika Viall", due: "Mar 27", comment: "" },
+  { id: "TS-5", notionId: "32f4b5e1-c025-814a-b153-c2eebb43ed53", task: "Nippon Life Q4 2025 Data Request — confirm receipt of updated workbook", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Alex Daves", due: "Mar 31", comment: "" },
+  { id: "TS-6", notionId: "32f4b5e1-c025-81e9-b77d-d77c85956b29", task: "VRS Workbook — waiting on Erika", category: "IR - USFRT II", status: "Complete", priority: "Medium", owner: "Alex / Erika", due: "Mar 31", comment: "" },
+  { id: "TS-7", notionId: "32f4b5e1-c025-81c0-b47d-f8e756dd556c", task: "IEQ Capital LLC Questionnaire — confirm completion", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Alex Daves", due: "", comment: "" },
+  { id: "TS-8", notionId: "32f4b5e1-c025-8178-8bab-ffa1d79e6cad", task: "VRS – Townsend Questionnaire", category: "IR - Core Fund", status: "Complete", priority: "High", owner: "Tyler / Alex", due: "Apr 15", comment: "" },
+  { id: "TS-9", notionId: "32f4b5e1-c025-8164-aed4-c66b71baaa4b", task: "Core Fund Newsletter — send draft to auditors", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Tyler / Brenda", due: "Mar 31", comment: "" },
+  { id: "TS-10", notionId: "32f4b5e1-c025-810f-a225-cb21c51ca92b", task: "IFC State Composite Letters TY2025 — follow up with PwC", category: "IR - Core Fund", status: "Waiting On Others", priority: "Medium", owner: "Alex Daves", due: "", comment: "" },
+  { id: "TS-11", notionId: "32f4b5e1-c025-81dc-8303-c7d714642d53", task: "Distribution #16 — confirm Nippon reinvestment allocation", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Alex / Erika / Brenda", due: "", comment: "" },
+  { id: "TS-12", notionId: "32f4b5e1-c025-81f7-a228-f91c2e7faa6a", task: "USFRT II K-1s — confirm federal and state delivery", category: "IR - Core Fund", status: "Waiting On Others", priority: "High", owner: "Alex / Erika / Chelsey", due: "Apr 15", comment: "" },
+  { id: "TS-13", notionId: "32f4b5e1-c025-8136-894f-f655ca168a7a", task: "Sloan Carlson internship — forward resume/cover letter to Alex", category: "Operations/HR", status: "Waiting On Others", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-14", notionId: "32f4b5e1-c025-8108-9119-fb7407613674", task: "Leave Eli Gray's MacBook + charger at front desk for ThinkTech pickup", category: "Operations/HR", status: "Complete", priority: "High", owner: "Tyler", due: "Mar 26", comment: "" },
+  { id: "TS-15", notionId: "32f4b5e1-c025-8183-8940-fd5513ae36d4", task: "Box Renewal — connect with Noah Greenberg about new contract", category: "Operations/HR", status: "In Progress", priority: "Medium", owner: "Tyler", due: "Mar 28", comment: "" },
+  { id: "TS-16", notionId: "32f4b5e1-c025-81c7-b8ff-ca9e745423fa", task: "Post weekly #ir-updates", category: "Communications", status: "Not Started", priority: "High", owner: "Tyler", due: "Mar 26", comment: "" },
+  { id: "TS-17", notionId: "32f4b5e1-c025-8100-bec1-e83d1dbb36a7", task: "RSVP for CRM Discussion meeting", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "Mar 31", comment: "" },
+  { id: "TS-18", notionId: "32f4b5e1-c025-81e5-8cf6-d53683beac47", task: "Ohio data request — Alex to research", category: "IR - USFRT II", status: "Waiting On Others", priority: "Medium", owner: "Alex Daves", due: "", comment: "" },
+  { id: "TS-19", notionId: "32f4b5e1-c025-81a6-b78a-d34648742fbe", task: "Ownership Transfer Paperwork for Andrew A. Payne Trust", category: "IR - Core Fund", status: "Waiting On Others", priority: "Medium", owner: "Tyler / Alex / Brooks Pierce", due: "", comment: "" },
+  { id: "TS-20", notionId: "32f4b5e1-c025-81fc-8e35-e96b40aeed1f", task: "Harrison Street / Versus Capital — confirm receipt of farmland templates", category: "IR - Core Fund", status: "Complete", priority: "Low", owner: "Tyler / Alex", due: "", comment: "" },
+  { id: "TS-21", notionId: "32f4b5e1-c025-819e-8310-f2e49dcbe85b", task: "Rethink Events / AG BRANDS — decide on ticket transfer", category: "Communications", status: "Complete", priority: "Low", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-22", notionId: "32f4b5e1-c025-81e8-8a45-fb321cfff606", task: "Daniel Wichman voicemail — confirm forwarded to HR", category: "Culture", status: "Complete", priority: "Low", owner: "Roxie Nebel", due: "", comment: "" },
+  { id: "TS-23", notionId: "32f4b5e1-c025-81fc-aa40-ed7c237b6d07", task: "PNW newsletter write-up — get context from Paul Kim / Toby", category: "Communications", status: "Complete", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-24", notionId: "3304b5e1-c025-81c0-8835-f376b9fd4be7", task: "Weekdone invoice — John Kruse locked out of OKR platform", category: "Operations/HR", status: "Complete", priority: "High", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-25", notionId: "3304b5e1-c025-81b6-863e-f3ef3da8a0e1", task: "Forward IR analyst candidate resume (Eli Cheatham) to John Graves & Alex Daves", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-26", notionId: "3304b5e1-c025-8172-987d-f75ea06e1682", task: "Reply to Alex Daves — schedule custom CRM discussion", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-27", notionId: "3304b5e1-c025-81c3-b485-e65c9077de20", task: "Review Joe's updated USFRT III Fundamental Data", category: "IR - USFRT III", status: "Complete", priority: "High", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-28", notionId: "3304b5e1-c025-8137-b775-de43b43bcc75", task: "Check Intralinks exchange — new 'FS v3 questions' document", category: "IR - Core Fund", status: "Complete", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-29", notionId: "3304b5e1-c025-81ad-941d-eb8cb47b7172", task: "Add Aishwarya Tandon to Intl. Farming Claude license", category: "Operations/HR", status: "Complete", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-30", notionId: "3304b5e1-c025-81f4-8b33-de0ea5665f6b", task: "Reply to Alex DMs — VRS document recipient + Ohio questionnaire location", category: "IR - USFRT II", status: "Not Started", priority: "High", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-31", notionId: "3304b5e1-c025-8178-846a-f9f09655014d", task: "Q4 2025 Cybersecurity Review — review ThinkTech report with Eli Gray", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-32", notionId: "3304b5e1-c025-8178-846a-f9f09655014d", task: "Check voicemail from (984) number — forwarded to IR inbox", category: "IR - Core Fund", status: "Not Started", priority: "Low", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-33", notionId: "3334b5e1-c025-8195-b0dc-d550e444d778", task: "Reply to TresVista — set up Claude access for Neharika Pattnaik", category: "Operations/HR", status: "Not Started", priority: "High", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-34", notionId: "3334b5e1-c025-8146-8479-e2e6ddde6df9", task: "Review USFRT III 2025 Q4 Financials Workbook on Intralinks", category: "IR - USFRT III", status: "Not Started", priority: "High", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-35", notionId: "3334b5e1-c025-81e7-8480-c6608647374d", task: "Process Lloyd Chapins expense submissions with Simran", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-36", notionId: "3334b5e1-c025-8121-a2e8-d2b423001dec", task: "Check shared investor inbox manually", category: "IR - Core Fund", status: "Not Started", priority: "High", owner: "Tyler", due: "", comment: "" },
+  { id: "TS-37", notionId: "3334b5e1-c025-81ed-8bc9-fedd8e4985d6", task: "IR analyst/associate hiring — confirm Indeed posting & review candidates", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "", comment: "Reached out to Sloan for more info — waiting on her response." },
+  { id: "TS-38", notionId: "3334b5e1-c025-8195-8de8-c3525d2ff4cf", task: "ThinkTech IT Review meeting prep", category: "Operations/HR", status: "Not Started", priority: "Medium", owner: "Tyler", due: "Mar 31", comment: "" },
 ];
 
 // ── Change tracking ──
@@ -1906,6 +1939,58 @@ function handleTextEdit(el) {
   }
 }
 
+
+// ── Comment popup ──
+let currentCommentTaskId = null;
+
+function openCommentPopup(event, taskId) {
+  event.stopPropagation();
+  const popup = document.getElementById("commentPopup");
+  const textarea = document.getElementById("commentTextarea");
+  const title = document.getElementById("commentPopupTitle");
+  const task = TASKS.find(t => t.id === taskId);
+  if (!task) return;
+  currentCommentTaskId = taskId;
+  title.textContent = taskId + " NOTES";
+  textarea.value = task.comment || "";
+  const btn = event.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  let top = rect.bottom + 6;
+  let left = rect.left - 280;
+  if (left < 8) left = 8;
+  if (top + 200 > window.innerHeight) top = rect.top - 200;
+  popup.style.top = top + "px";
+  popup.style.left = left + "px";
+  popup.classList.add("visible");
+  textarea.focus();
+}
+
+function closeCommentPopup() {
+  document.getElementById("commentPopup").classList.remove("visible");
+  currentCommentTaskId = null;
+}
+
+function saveComment() {
+  if (!currentCommentTaskId) return;
+  const textarea = document.getElementById("commentTextarea");
+  const task = TASKS.find(t => t.id === currentCommentTaskId);
+  if (!task) return;
+  const oldVal = task.comment || "";
+  const newVal = textarea.value.trim();
+  task.comment = newVal;
+  trackChange(currentCommentTaskId, "comment", oldVal, newVal);
+  showToast(task.id + " note saved — sync to save");
+  closeCommentPopup();
+  applyFilters();
+}
+
+document.addEventListener("click", function(e) {
+  const popup = document.getElementById("commentPopup");
+  if (popup.classList.contains("visible") && !popup.contains(e.target) && !e.target.closest(".comment-btn")) {
+    closeCommentPopup();
+  }
+});
+
 function updateKPIs() {
   const total = TASKS.length;
   const notStarted = TASKS.filter(t => t.status === "Not Started").length;
@@ -1926,6 +2011,10 @@ function updateKPIs() {
 
 function buildRow(t) {
   const rowClass = t.status === "Complete" ? ' style="opacity:0.7;"' : '';
+  const hasComment = t.comment && t.comment.trim().length > 0;
+  const commentIcon = hasComment ? 'comment' : 'add_comment';
+  const commentClass = hasComment ? 'comment-btn has-comment' : 'comment-btn';
+  const commentTitle = hasComment ? t.comment.replace(/"/g, '&quot;').replace(/'/g, '&#39;') : 'Add a note';
   return `<tr${rowClass}>
     <td style="color:var(--text-muted);font-size:11px;">${t.id}</td>
     <td><span class="inline-text task-name" contenteditable="true" data-task="${t.id}" data-field="task" onblur="handleTextEdit(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${t.task}</span></td>
@@ -1934,6 +2023,7 @@ function buildRow(t) {
     <td>${prioritySelect(t.id, t.priority)}</td>
     <td><span class="inline-text owner-field" contenteditable="true" data-task="${t.id}" data-field="owner" onblur="handleTextEdit(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${t.owner}</span></td>
     <td>${dueInput(t.id, t.due)}</td>
+    <td class="comment-cell"><button class="${commentClass}" onclick="openCommentPopup(event, '${t.id}')" title="${commentTitle}"><span class="material-symbols-outlined" style="font-size:16px;">${commentIcon}</span></button></td>
   </tr>`;
 }
 
@@ -2213,7 +2303,7 @@ function closeSyncModal() {
 }
 function copySyncPayload() {
   const payload = PENDING_CHANGES.map(c => {
-    const fieldMap = { status: "Status", priority: "Priority", due: "Due Date" };
+    const fieldMap = { status: "Status", priority: "Priority", due: "Due Date", comment: "" };
     return `${c.taskId} (Notion: ${c.notionId}) → ${fieldMap[c.field] || c.field}: "${c.newVal}"`;
   }).join('\n');
   const text = `Sync these TyMind changes to Notion:\n\n${payload}`;
