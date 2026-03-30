@@ -1409,6 +1409,26 @@ tr:hover .comment-btn.has-comment { opacity: 1; }
 .comment-save-row { display: flex; justify-content: flex-end; margin-top: 6px; gap: 6px; }
 .comment-save-btn { background: var(--cyan); color: #0a1628; border: none; border-radius: 4px; padding: 4px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
 .comment-save-btn:hover { opacity: 0.85; }
+
+.add-task-btn { position: fixed; bottom: 28px; right: 28px; z-index: 900; width: 52px; height: 52px; border-radius: 50%; background: var(--cyan); color: var(--bg-deep); border: none; cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,229,160,0.35); transition: transform 0.2s, box-shadow 0.2s; }
+.add-task-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,229,160,0.5); }
+.add-task-overlay { display: none; position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); }
+.add-task-overlay.visible { display: flex; align-items: center; justify-content: center; }
+.add-task-modal { background: rgba(8,18,36,0.98); border: 1px solid var(--border-glow); border-radius: 12px; padding: 24px 28px; width: 420px; max-width: 90vw; box-shadow: 0 12px 48px rgba(0,0,0,0.7); }
+.add-task-modal h3 { margin: 0 0 18px 0; font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--cyan); letter-spacing: 1px; }
+.add-task-field { margin-bottom: 14px; }
+.add-task-field label { display: block; font-size: 10px; color: var(--text-muted); font-family: 'Press Start 2P', monospace; letter-spacing: 0.5px; margin-bottom: 5px; }
+.add-task-field input, .add-task-field select, .add-task-field textarea { width: 100%; background: rgba(12,28,48,0.6); border: 1px solid var(--border-subtle); border-radius: 6px; color: #e0e6f0; font-family: inherit; font-size: 13px; padding: 8px 10px; outline: none; box-sizing: border-box; }
+.add-task-field input:focus, .add-task-field select:focus, .add-task-field textarea:focus { border-color: var(--cyan); }
+.add-task-field textarea { min-height: 48px; max-height: 80px; resize: vertical; }
+.add-task-row { display: flex; gap: 12px; }
+.add-task-row .add-task-field { flex: 1; }
+.add-task-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.add-task-actions button { font-family: 'Press Start 2P', monospace; font-size: 10px; padding: 8px 18px; border-radius: 6px; cursor: pointer; border: none; }
+.add-task-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border-subtle) !important; }
+.add-task-cancel:hover { color: #fff; border-color: var(--text-muted) !important; }
+.add-task-save { background: var(--cyan); color: var(--bg-deep); opacity: 0.9; }
+.add-task-save:hover { opacity: 1; }
 </style>
 </head>
 <body>
@@ -1666,6 +1686,65 @@ tr:hover .comment-btn.has-comment { opacity: 1; }
 </div>
 
 <!-- Comment popup -->
+<button class="add-task-btn" onclick="openAddTaskModal()" title="Add Task"><span class="material-symbols-outlined" style="font-size:28px;">add</span></button>
+<div class="add-task-overlay" id="addTaskOverlay" onclick="if(event.target===this)closeAddTaskModal()">
+  <div class="add-task-modal">
+    <h3>+ NEW TASK</h3>
+    <div class="add-task-field">
+      <label>TASK NAME</label>
+      <input type="text" id="atTask" placeholder="What needs to be done?" />
+    </div>
+    <div class="add-task-row">
+      <div class="add-task-field">
+        <label>CATEGORY</label>
+        <select id="atCategory">
+          <option value="IR - Core Fund">IR - Core Fund</option>
+          <option value="IR - USFRT II">IR - USFRT II</option>
+          <option value="IR - USFRT III">IR - USFRT III</option>
+          <option value="Operations/HR">Operations/HR</option>
+          <option value="Communications">Communications</option>
+          <option value="Culture">Culture</option>
+        </select>
+      </div>
+      <div class="add-task-field">
+        <label>STATUS</label>
+        <select id="atStatus">
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Waiting On Others">Waiting On Others</option>
+          <option value="Complete">Complete</option>
+        </select>
+      </div>
+    </div>
+    <div class="add-task-row">
+      <div class="add-task-field">
+        <label>PRIORITY</label>
+        <select id="atPriority">
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div class="add-task-field">
+        <label>OWNER</label>
+        <input type="text" id="atOwner" value="Tyler" />
+      </div>
+    </div>
+    <div class="add-task-field">
+      <label>DUE DATE</label>
+      <input type="date" id="atDue" />
+    </div>
+    <div class="add-task-field">
+      <label>COMMENT / NOTES</label>
+      <textarea id="atComment" placeholder="Optional notes..."></textarea>
+    </div>
+    <div class="add-task-actions">
+      <button class="add-task-cancel" onclick="closeAddTaskModal()">CANCEL</button>
+      <button class="add-task-save" onclick="saveNewTask()">ADD TASK</button>
+    </div>
+  </div>
+</div>
+
 <div class="comment-popup" id="commentPopup">
   <div class="comment-popup-header">
     <span id="commentPopupTitle">NOTES</span>
@@ -1991,6 +2070,49 @@ document.addEventListener("click", function(e) {
     closeCommentPopup();
   }
 });
+
+function openAddTaskModal() {
+  document.getElementById('atTask').value = '';
+  document.getElementById('atCategory').value = 'IR - Core Fund';
+  document.getElementById('atStatus').value = 'Not Started';
+  document.getElementById('atPriority').value = 'Medium';
+  document.getElementById('atOwner').value = 'Tyler';
+  document.getElementById('atDue').value = '';
+  document.getElementById('atComment').value = '';
+  document.getElementById('addTaskOverlay').classList.add('visible');
+  setTimeout(() => document.getElementById('atTask').focus(), 100);
+}
+function closeAddTaskModal() {
+  document.getElementById('addTaskOverlay').classList.remove('visible');
+}
+function saveNewTask() {
+  const taskName = document.getElementById('atTask').value.trim();
+  if (!taskName) { document.getElementById('atTask').focus(); return; }
+  const maxId = TASKS.reduce((mx, t) => { const n = parseInt(t.id.replace('TS-','')); return n > mx ? n : mx; }, 0);
+  const newId = 'TS-' + (maxId + 1);
+  const rawDue = document.getElementById('atDue').value;
+  let dueFmt = '';
+  if (rawDue) {
+    const d = new Date(rawDue + 'T12:00:00');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    dueFmt = months[d.getMonth()] + ' ' + d.getDate();
+  }
+  const newTask = {
+    id: newId,
+    notionId: '',
+    task: taskName,
+    category: document.getElementById('atCategory').value,
+    status: document.getElementById('atStatus').value,
+    priority: document.getElementById('atPriority').value,
+    owner: document.getElementById('atOwner').value.trim() || 'Tyler',
+    due: dueFmt,
+    comment: document.getElementById('atComment').value.trim()
+  };
+  TASKS.push(newTask);
+  closeAddTaskModal();
+  renderTable();
+  updateKPIs();
+}
 
 function updateKPIs() {
   const total = TASKS.length;
