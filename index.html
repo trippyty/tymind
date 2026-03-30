@@ -1410,9 +1410,9 @@ tr:hover .comment-btn.has-comment { opacity: 1; }
 .comment-save-btn { background: var(--cyan); color: #0a1628; border: none; border-radius: 4px; padding: 4px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
 .comment-save-btn:hover { opacity: 0.85; }
 
-.add-task-btn { position: fixed; bottom: 28px; right: 28px; z-index: 900; width: 52px; height: 52px; border-radius: 50%; background: var(--cyan); color: var(--bg-deep); border: none; cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,229,160,0.35); transition: transform 0.2s, box-shadow 0.2s; }
+.add-task-btn { position: fixed !important; bottom: 28px !important; right: 28px !important; z-index: 9000 !important; width: 52px; height: 52px; border-radius: 50%; background: var(--cyan); color: var(--bg-deep); border: none; cursor: pointer; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,229,160,0.35); transition: transform 0.2s, box-shadow 0.2s; }
 .add-task-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,229,160,0.5); }
-.add-task-overlay { display: none; position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); }
+.add-task-overlay { display: none; position: fixed !important; inset: 0; z-index: 9998 !important; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); }
 .add-task-overlay.visible { display: flex; align-items: center; justify-content: center; }
 .add-task-modal { background: rgba(8,18,36,0.98); border: 1px solid var(--border-glow); border-radius: 12px; padding: 24px 28px; width: 420px; max-width: 90vw; box-shadow: 0 12px 48px rgba(0,0,0,0.7); }
 .add-task-modal h3 { margin: 0 0 18px 0; font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--cyan); letter-spacing: 1px; }
